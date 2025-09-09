@@ -19,6 +19,16 @@ function bwk_table_invoice_items() {
     return $wpdb->prefix . 'bwk_invoice_items';
 }
 
+function bwk_table_quotes() {
+    global $wpdb;
+    return $wpdb->prefix . 'bwk_quotes';
+}
+
+function bwk_table_quote_items() {
+    global $wpdb;
+    return $wpdb->prefix . 'bwk_quote_items';
+}
+
 function bwk_table_ledger() {
     global $wpdb;
     return $wpdb->prefix . 'bwk_ledger';
@@ -38,6 +48,15 @@ function bwk_next_invoice_number() {
     $seq++;
     bwk_update_option( 'invoice_seq', $seq );
     $prefix = bwk_get_option( 'number_prefix', 'INV-' );
+    $pad    = (int) bwk_get_option( 'number_padding', 4 );
+    return $prefix . str_pad( (string) $seq, $pad, '0', STR_PAD_LEFT );
+}
+
+function bwk_next_quote_number() {
+    $seq = (int) bwk_get_option( 'quote_seq', 0 );
+    $seq++;
+    bwk_update_option( 'quote_seq', $seq );
+    $prefix = bwk_get_option( 'quote_prefix', 'QT-' );
     $pad    = (int) bwk_get_option( 'number_padding', 4 );
     return $prefix . str_pad( (string) $seq, $pad, '0', STR_PAD_LEFT );
 }

@@ -38,6 +38,7 @@ function bwk_accounting_lite_init() {
     BWK_Settings::init();
     BWK_Admin_Menu::init();
     BWK_Invoices::init();
+    BWK_Quotes_Table::init();
     BWK_Ledger::init();
     BWK_Sync_WooCommerce::init();
     BWK_Ajax::init();
