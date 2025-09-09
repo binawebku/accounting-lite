@@ -35,6 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <tr><th><?php _e( 'Discount', 'bwk-accounting-lite' ); ?></th><td><?php echo esc_html( $invoice->discount_total ); ?></td></tr>
         <tr><th><?php _e( 'Tax', 'bwk-accounting-lite' ); ?></th><td><?php echo esc_html( $invoice->tax_total ); ?></td></tr>
         <tr><th><?php _e( 'Shipping', 'bwk-accounting-lite' ); ?></th><td><?php echo esc_html( $invoice->shipping_total ); ?></td></tr>
+        <tr><th><?php _e( 'Zakat', 'bwk-accounting-lite' ); ?></th><td><?php echo esc_html( $invoice->zakat_total ); ?></td></tr>
         <tr><th><?php _e( 'Grand Total', 'bwk-accounting-lite' ); ?></th><td><?php echo esc_html( $invoice->grand_total ); ?></td></tr>
     </table>
     <footer>
