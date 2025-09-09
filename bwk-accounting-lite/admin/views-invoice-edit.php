@@ -53,6 +53,8 @@ $invoice_id = $invoice ? intval( $invoice->id ) : 0;
             <td><input name="tax_total" id="tax_total" type="number" step="0.01" value="<?php echo esc_attr( $invoice ? $invoice->tax_total : 0 ); ?>" /></td></tr>
             <tr><th><label for="shipping_total"><?php _e( 'Shipping', 'bwk-accounting-lite' ); ?></label></th>
             <td><input name="shipping_total" id="shipping_total" type="number" step="0.01" value="<?php echo esc_attr( $invoice ? $invoice->shipping_total : 0 ); ?>" /></td></tr>
+            <tr><th><label for="zakat_total"><?php _e( 'Zakat', 'bwk-accounting-lite' ); ?></label></th>
+            <td><input name="zakat_total" id="zakat_total" type="number" step="0.01" value="<?php echo esc_attr( $invoice ? $invoice->zakat_total : 0 ); ?>" readonly /></td></tr>
             <tr><th><label for="grand_total"><?php _e( 'Grand Total', 'bwk-accounting-lite' ); ?></label></th>
             <td><input name="grand_total" id="grand_total" type="number" step="0.01" value="<?php echo esc_attr( $invoice ? $invoice->grand_total : 0 ); ?>" /></td></tr>
             <tr><th><label for="currency"><?php _e( 'Currency', 'bwk-accounting-lite' ); ?></label></th>

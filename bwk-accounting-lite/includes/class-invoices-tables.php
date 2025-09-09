@@ -49,9 +49,16 @@ class BWK_Invoices {
         $item_tb = bwk_table_invoice_items();
 
         $id      = isset( $_POST['invoice_id'] ) ? intval( $_POST['invoice_id'] ) : 0;
+        $prev_status = $id ? $wpdb->get_var( $wpdb->prepare( "SELECT status FROM $table WHERE id=%d", $id ) ) : '';
         $number  = sanitize_text_field( $_POST['number'] );
         if ( empty( $number ) ) {
             $number = bwk_next_invoice_number();
+        }
+        $grand_total = floatval( $_POST['grand_total'] );
+        $zakat_total = 0;
+        if ( get_option( 'bwk_accounting_enable_zakat' ) ) {
+            $rate        = floatval( bwk_get_option( 'zakat_rate', 2.5 ) );
+            $zakat_total = $grand_total * ( $rate / 100 );
         }
         $data = array(
             'number'         => $number,
@@ -64,7 +71,8 @@ class BWK_Invoices {
             'discount_total' => floatval( $_POST['discount_total'] ),
             'tax_total'      => floatval( $_POST['tax_total'] ),
             'shipping_total' => floatval( $_POST['shipping_total'] ),
-            'grand_total'    => floatval( $_POST['grand_total'] ),
+            'zakat_total'    => $zakat_total,
+            'grand_total'    => $grand_total,
             'notes'          => sanitize_textarea_field( $_POST['notes'] ),
             'updated_at'     => current_time( 'mysql' ),
         );
@@ -98,6 +106,10 @@ class BWK_Invoices {
                 ) );
                 $line_no++;
             }
+        }
+
+        if ( $data['status'] === 'paid' && $prev_status !== 'paid' && $zakat_total > 0 ) {
+            BWK_Ledger::insert_zakat( $id, $zakat_total, $data['currency'] );
         }
 
         wp_redirect( admin_url( 'admin.php?page=bwk-accounting' ) );

@@ -26,6 +26,7 @@ class BWK_Activator {
             discount_total decimal(18,2) NOT NULL DEFAULT 0,
             tax_total decimal(18,2) NOT NULL DEFAULT 0,
             shipping_total decimal(18,2) NOT NULL DEFAULT 0,
+            zakat_total decimal(18,2) NOT NULL DEFAULT 0,
             grand_total decimal(18,2) NOT NULL DEFAULT 0,
             notes text NULL,
             wc_order_id bigint(20) unsigned NULL,
@@ -68,5 +69,14 @@ class BWK_Activator {
         dbDelta( $sql_invoices );
         dbDelta( $sql_items );
         dbDelta( $sql_ledger );
+    }
+
+    public static function upgrade() {
+        global $wpdb;
+        $table = bwk_table_invoices();
+        $col   = $wpdb->get_var( $wpdb->prepare( "SHOW COLUMNS FROM $table LIKE %s", 'zakat_total' ) );
+        if ( ! $col ) {
+            self::activate();
+        }
     }
 }

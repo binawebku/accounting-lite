@@ -27,6 +27,16 @@ class BWK_Ledger {
         $wpdb->insert( bwk_table_ledger(), $data );
     }
 
+    public static function insert_zakat( $invoice_id, $amount, $currency ) {
+        self::insert_entry( array(
+            'source'    => 'invoice',
+            'source_id' => $invoice_id,
+            'txn_type'  => 'zakat',
+            'amount'    => $amount,
+            'currency'  => $currency,
+        ) );
+    }
+
     public static function render_list_page() {
         if ( ! bwk_current_user_can() ) {
             return;

@@ -28,6 +28,10 @@ $active = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'general';
                 <td><input name="bwk_accounting_company_email" id="bwk_accounting_company_email" type="email" value="<?php echo esc_attr( bwk_get_option( 'company_email' ) ); ?>" class="regular-text" /></td></tr>
                 <tr><th><label for="bwk_accounting_default_currency"><?php _e( 'Default Currency', 'bwk-accounting-lite' ); ?></label></th>
                 <td><input name="bwk_accounting_default_currency" id="bwk_accounting_default_currency" type="text" value="<?php echo esc_attr( bwk_get_option( 'default_currency', 'USD' ) ); ?>" class="regular-text" /></td></tr>
+                <tr><th scope="row"><?php _e( 'Enable Zakat', 'bwk-accounting-lite' ); ?></th>
+                <td><input type="checkbox" name="bwk_accounting_enable_zakat" value="1" <?php checked( bwk_get_option( 'enable_zakat', 0 ), 1 ); ?> /></td></tr>
+                <tr><th><label for="bwk_accounting_zakat_rate"><?php _e( 'Zakat Rate (%)', 'bwk-accounting-lite' ); ?></label></th>
+                <td><input name="bwk_accounting_zakat_rate" id="bwk_accounting_zakat_rate" type="number" step="0.01" value="<?php echo esc_attr( bwk_get_option( 'zakat_rate', 2.5 ) ); ?>" /></td></tr>
             </table>
             <?php
         } elseif ( 'numbering' === $active ) {

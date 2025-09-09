@@ -16,6 +16,8 @@ class BWK_Settings {
         register_setting( 'bwk_settings_general', 'bwk_accounting_company_name' );
         register_setting( 'bwk_settings_general', 'bwk_accounting_company_email' );
         register_setting( 'bwk_settings_general', 'bwk_accounting_default_currency' );
+        register_setting( 'bwk_settings_general', 'bwk_accounting_enable_zakat' );
+        register_setting( 'bwk_settings_general', 'bwk_accounting_zakat_rate' );
         register_setting( 'bwk_settings_numbering', 'bwk_accounting_number_prefix' );
         register_setting( 'bwk_settings_numbering', 'bwk_accounting_number_padding' );
         register_setting( 'bwk_settings_advanced', 'bwk_accounting_remove_data' );
