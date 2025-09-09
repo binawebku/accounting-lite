@@ -1,0 +1,8 @@
+body.bwk-invoice { font-family: sans-serif; margin: 20px; }
+.invoice-wrapper { max-width: 800px; margin: auto; }
+.invoice-wrapper table { width: 100%; border-collapse: collapse; }
+.invoice-wrapper table, .invoice-wrapper th, .invoice-wrapper td { border: 1px solid #ccc; }
+.invoice-wrapper th, .invoice-wrapper td { padding: 6px; }
+.invoice-wrapper table.items th, .invoice-wrapper table.items td { text-align: left; }
+.invoice-wrapper table.totals { margin-top: 20px; }
+@media print { body { margin: 0; } }
