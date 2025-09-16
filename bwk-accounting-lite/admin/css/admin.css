@@ -1,4 +1,12 @@
 /* Admin styles for BWK Accounting Lite */
 #bwk-items-table input { width: 100%; }
+#bwk-items-table .bwk-item-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+#bwk-items-table .select2-container {
+    width: 100% !important;
+}
 #bwk-items-table .bwk-line-total { text-align: right; }
 .wrap .widefat td { vertical-align: top; }

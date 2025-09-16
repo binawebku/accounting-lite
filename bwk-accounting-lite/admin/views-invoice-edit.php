@@ -31,13 +31,40 @@ $invoice_id = $invoice ? intval( $invoice->id ) : 0;
             <thead><tr><th><?php _e( 'Item', 'bwk-accounting-lite' ); ?></th><th><?php _e( 'Qty', 'bwk-accounting-lite' ); ?></th><th><?php _e( 'Unit Price', 'bwk-accounting-lite' ); ?></th><th><?php _e( 'Line Total', 'bwk-accounting-lite' ); ?></th><th>&nbsp;</th></tr></thead>
             <tbody>
                 <?php
+                $search_placeholder = esc_attr__( 'Search for a product…', 'bwk-accounting-lite' );
+                $item_placeholder   = esc_attr__( 'Item name', 'bwk-accounting-lite' );
                 if ( $items ) {
                     foreach ( $items as $it ) {
-                        echo '<tr><td><input type="text" name="item_name[]" value="' . esc_attr( $it->item_name ) . '" /></td>';
-                        echo '<td><input type="number" step="0.01" name="qty[]" value="' . esc_attr( $it->qty ) . '" class="bwk-qty" /></td>';
-                        echo '<td><input type="number" step="0.01" name="unit_price[]" value="' . esc_attr( $it->unit_price ) . '" class="bwk-price" /></td>';
-                        echo '<td class="bwk-line-total">' . esc_html( $it->line_total ) . '</td><td><button type="button" class="button bwk-remove">&times;</button></td></tr>';
+                        ?>
+                        <tr>
+                            <td>
+                                <div class="bwk-item-field">
+                                    <select class="bwk-product-search" name="product_id[]" data-placeholder="<?php echo $search_placeholder; ?>" data-allow_clear="true" data-action="woocommerce_json_search_products_and_variations" style="width: 100%;"></select>
+                                    <input type="text" name="item_name[]" class="bwk-item-name" value="<?php echo esc_attr( $it->item_name ); ?>" placeholder="<?php echo $item_placeholder; ?>" autocomplete="off" />
+                                </div>
+                            </td>
+                            <td><input type="number" step="0.01" name="qty[]" value="<?php echo esc_attr( $it->qty ); ?>" class="bwk-qty" /></td>
+                            <td><input type="number" step="0.01" name="unit_price[]" value="<?php echo esc_attr( $it->unit_price ); ?>" class="bwk-price" /></td>
+                            <td class="bwk-line-total"><?php echo esc_html( number_format_i18n( (float) $it->line_total, 2 ) ); ?></td>
+                            <td><button type="button" class="button bwk-remove">&times;</button></td>
+                        </tr>
+                        <?php
                     }
+                } else {
+                    ?>
+                    <tr>
+                        <td>
+                            <div class="bwk-item-field">
+                                <select class="bwk-product-search" name="product_id[]" data-placeholder="<?php echo $search_placeholder; ?>" data-allow_clear="true" data-action="woocommerce_json_search_products_and_variations" style="width: 100%;"></select>
+                                <input type="text" name="item_name[]" class="bwk-item-name" value="" placeholder="<?php echo $item_placeholder; ?>" autocomplete="off" />
+                            </div>
+                        </td>
+                        <td><input type="number" step="0.01" name="qty[]" value="" class="bwk-qty" /></td>
+                        <td><input type="number" step="0.01" name="unit_price[]" value="" class="bwk-price" /></td>
+                        <td class="bwk-line-total"><?php echo esc_html( number_format_i18n( 0, 2 ) ); ?></td>
+                        <td><button type="button" class="button bwk-remove">&times;</button></td>
+                    </tr>
+                    <?php
                 }
                 ?>
             </tbody>

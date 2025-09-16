@@ -29,8 +29,27 @@ class BWK_Admin_Menu {
         if ( strpos( $hook, 'bwk' ) === false ) {
             return;
         }
+        $deps = array( 'jquery' );
+
+        if ( class_exists( 'WooCommerce' ) ) {
+            wp_enqueue_style( 'woocommerce_admin_styles' );
+            wp_enqueue_script( 'wc-product-search' );
+            $deps[] = 'wc-product-search';
+        }
+
         wp_enqueue_style( 'bwk-admin', BWK_AL_URL . 'admin/css/admin.css', array(), BWK_AL_VERSION );
-        wp_enqueue_script( 'bwk-admin', BWK_AL_URL . 'admin/js/admin.js', array( 'jquery' ), BWK_AL_VERSION, true );
+        wp_enqueue_script( 'bwk-admin', BWK_AL_URL . 'admin/js/admin.js', $deps, BWK_AL_VERSION, true );
+
+        wp_localize_script(
+            'bwk-admin',
+            'bwkAdmin',
+            array(
+                'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
+                'productNonce'       => wp_create_nonce( 'bwk_wc_product_details' ),
+                'i18nSearchProducts' => __( 'Search for a product…', 'bwk-accounting-lite' ),
+                'i18nItemName'       => __( 'Item name', 'bwk-accounting-lite' ),
+            )
+        );
     }
     public static function admin_bar($wp_admin_bar) {
         if ( ! bwk_current_user_can() ) {
