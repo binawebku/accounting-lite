@@ -40,6 +40,7 @@ class BWK_Activator {
         $sql_items = "CREATE TABLE " . bwk_table_invoice_items() . " (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             invoice_id bigint(20) unsigned NOT NULL,
+            product_id bigint(20) unsigned DEFAULT NULL,
             line_no int NOT NULL,
             item_name varchar(200) NOT NULL,
             qty decimal(18,2) NOT NULL DEFAULT 1,
@@ -74,6 +75,7 @@ class BWK_Activator {
         $sql_quote_items = "CREATE TABLE " . bwk_table_quote_items() . " (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             quote_id bigint(20) unsigned NOT NULL,
+            product_id bigint(20) unsigned DEFAULT NULL,
             line_no int NOT NULL,
             item_name varchar(200) NOT NULL,
             qty decimal(18,2) NOT NULL DEFAULT 1,
@@ -117,5 +119,29 @@ class BWK_Activator {
         if ( ! $col ) {
             self::activate();
         }
+
+        self::maybe_add_product_id_column( bwk_table_invoice_items(), 'invoice_id' );
+        self::maybe_add_product_id_column( bwk_table_quote_items(), 'quote_id' );
+    }
+
+    private static function maybe_add_product_id_column( $table_name, $after_column ) {
+        global $wpdb;
+
+        $column_exists = $wpdb->get_var(
+            $wpdb->prepare( "SHOW COLUMNS FROM $table_name LIKE %s", 'product_id' )
+        );
+
+        if ( $column_exists ) {
+            return;
+        }
+
+        $after_clause = '';
+        if ( ! empty( $after_column ) ) {
+            $after_clause = " AFTER `{$after_column}`";
+        }
+
+        $wpdb->query(
+            "ALTER TABLE $table_name ADD COLUMN `product_id` bigint(20) unsigned DEFAULT NULL$after_clause"
+        );
     }
 }
