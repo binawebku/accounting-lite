@@ -42,13 +42,16 @@ class BWK_Activator {
             invoice_id bigint(20) unsigned NOT NULL,
             line_no int NOT NULL,
             item_name varchar(200) NOT NULL,
+            product_id bigint(20) unsigned NULL,
+            product_sku varchar(100) NULL,
             qty decimal(18,2) NOT NULL DEFAULT 1,
             unit_price decimal(18,2) NOT NULL DEFAULT 0,
             line_discount decimal(18,2) NOT NULL DEFAULT 0,
             line_tax decimal(18,2) NOT NULL DEFAULT 0,
             line_total decimal(18,2) NOT NULL DEFAULT 0,
             PRIMARY KEY (id),
-            KEY invoice_id (invoice_id)
+            KEY invoice_id (invoice_id),
+            KEY product_id (product_id)
         ) $charset_collate;";
 
         $sql_quotes = "CREATE TABLE " . bwk_table_quotes() . " (
@@ -76,11 +79,14 @@ class BWK_Activator {
             quote_id bigint(20) unsigned NOT NULL,
             line_no int NOT NULL,
             item_name varchar(200) NOT NULL,
+            product_id bigint(20) unsigned NULL,
+            product_sku varchar(100) NULL,
             qty decimal(18,2) NOT NULL DEFAULT 1,
             unit_price decimal(18,2) NOT NULL DEFAULT 0,
             line_total decimal(18,2) NOT NULL DEFAULT 0,
             PRIMARY KEY (id),
-            KEY quote_id (quote_id)
+            KEY quote_id (quote_id),
+            KEY product_id (product_id)
         ) $charset_collate;";
 
         $sql_ledger = "CREATE TABLE " . bwk_table_ledger() . " (
@@ -112,9 +118,31 @@ class BWK_Activator {
             self::activate();
             return;
         }
+        $needs_upgrade = false;
+
         $table = bwk_table_invoices();
         $col   = $wpdb->get_var( $wpdb->prepare( "SHOW COLUMNS FROM $table LIKE %s", 'zakat_total' ) );
         if ( ! $col ) {
+            $needs_upgrade = true;
+        }
+
+        $invoice_items = bwk_table_invoice_items();
+        if ( ! $wpdb->get_var( $wpdb->prepare( "SHOW COLUMNS FROM $invoice_items LIKE %s", 'product_id' ) ) ) {
+            $needs_upgrade = true;
+        }
+        if ( ! $wpdb->get_var( $wpdb->prepare( "SHOW COLUMNS FROM $invoice_items LIKE %s", 'product_sku' ) ) ) {
+            $needs_upgrade = true;
+        }
+
+        $quote_items = bwk_table_quote_items();
+        if ( ! $wpdb->get_var( $wpdb->prepare( "SHOW COLUMNS FROM $quote_items LIKE %s", 'product_id' ) ) ) {
+            $needs_upgrade = true;
+        }
+        if ( ! $wpdb->get_var( $wpdb->prepare( "SHOW COLUMNS FROM $quote_items LIKE %s", 'product_sku' ) ) ) {
+            $needs_upgrade = true;
+        }
+
+        if ( $needs_upgrade ) {
             self::activate();
         }
     }

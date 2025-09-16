@@ -40,6 +40,16 @@ class BWK_Quotes_Table {
             return null;
         }
         $items = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . bwk_table_quote_items() . ' WHERE quote_id=%d ORDER BY line_no ASC', $id ) );
+        foreach ( $items as $item ) {
+            $product_id       = property_exists( $item, 'product_id' ) ? absint( $item->product_id ) : 0;
+            $item->product_id = $product_id > 0 ? $product_id : null;
+
+            if ( property_exists( $item, 'product_sku' ) ) {
+                $item->product_sku = '' !== $item->product_sku ? $item->product_sku : null;
+            } else {
+                $item->product_sku = null;
+            }
+        }
         $quote->items = $items;
         return $quote;
     }
@@ -114,13 +124,25 @@ class BWK_Quotes_Table {
                 if ( '' === $name ) {
                     continue;
                 }
-                $qty   = floatval( $_POST['qty'][ $idx ] );
-                $price = floatval( $_POST['unit_price'][ $idx ] );
+                $qty   = isset( $_POST['qty'][ $idx ] ) ? floatval( $_POST['qty'][ $idx ] ) : 0;
+                $price = isset( $_POST['unit_price'][ $idx ] ) ? floatval( $_POST['unit_price'][ $idx ] ) : 0;
                 $total = $qty * $price;
+                $product_id = isset( $_POST['product_id'][ $idx ] ) ? absint( $_POST['product_id'][ $idx ] ) : 0;
+                $product_id = $product_id > 0 ? $product_id : null;
+
+                $product_sku = null;
+                if ( isset( $_POST['product_sku'][ $idx ] ) ) {
+                    $product_sku = sanitize_text_field( $_POST['product_sku'][ $idx ] );
+                    if ( '' === $product_sku ) {
+                        $product_sku = null;
+                    }
+                }
                 $wpdb->insert( $item_tb, array(
                     'quote_id'   => $id,
                     'line_no'    => $line_no,
                     'item_name'  => $name,
+                    'product_id' => $product_id,
+                    'product_sku'=> $product_sku,
                     'qty'        => $qty,
                     'unit_price' => $price,
                     'line_total' => $total,
@@ -164,13 +186,22 @@ class BWK_Quotes_Table {
         $wpdb->insert( $inv_tb, $inv_data );
         $invoice_id = $wpdb->insert_id;
         foreach ( $quote->items as $i => $it ) {
+            $product_id = isset( $it->product_id ) ? absint( $it->product_id ) : 0;
+            $product_id = $product_id > 0 ? $product_id : null;
+            $product_sku = null;
+            if ( isset( $it->product_sku ) && '' !== $it->product_sku ) {
+                $product_sku = $it->product_sku;
+            }
+
             $wpdb->insert( $item_tb, array(
-                'invoice_id' => $invoice_id,
-                'line_no'    => $i,
-                'item_name'  => $it->item_name,
-                'qty'        => $it->qty,
-                'unit_price' => $it->unit_price,
-                'line_total' => $it->line_total,
+                'invoice_id'   => $invoice_id,
+                'line_no'      => $i,
+                'item_name'    => $it->item_name,
+                'product_id'   => $product_id,
+                'product_sku'  => $product_sku,
+                'qty'          => $it->qty,
+                'unit_price'   => $it->unit_price,
+                'line_total'   => $it->line_total,
             ) );
         }
         wp_redirect( admin_url( 'admin.php?page=bwk-invoice-add&id=' . $invoice_id ) );

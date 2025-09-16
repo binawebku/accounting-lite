@@ -28,6 +28,17 @@ class BWK_Rest {
             return new WP_Error( 'not_found', 'Invoice not found', array( 'status' => 404 ) );
         }
         $items = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . bwk_table_invoice_items() . ' WHERE invoice_id=%d ORDER BY line_no ASC', $id ), ARRAY_A );
+        foreach ( $items as &$item ) {
+            $product_id        = isset( $item['product_id'] ) ? absint( $item['product_id'] ) : 0;
+            $item['product_id'] = $product_id > 0 ? $product_id : null;
+
+            if ( array_key_exists( 'product_sku', $item ) ) {
+                $item['product_sku'] = '' !== $item['product_sku'] ? $item['product_sku'] : null;
+            } else {
+                $item['product_sku'] = null;
+            }
+        }
+        unset( $item );
         $invoice['items'] = $items;
         return rest_ensure_response( $invoice );
     }

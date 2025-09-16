@@ -93,16 +93,30 @@ class BWK_Invoices {
                 if ( '' === $name ) {
                     continue;
                 }
-                $qty   = floatval( $_POST['qty'][ $idx ] );
-                $price = floatval( $_POST['unit_price'][ $idx ] );
+                $qty   = isset( $_POST['qty'][ $idx ] ) ? floatval( $_POST['qty'][ $idx ] ) : 0;
+                $price = isset( $_POST['unit_price'][ $idx ] ) ? floatval( $_POST['unit_price'][ $idx ] ) : 0;
                 $total = $qty * $price;
+
+                $product_id = isset( $_POST['product_id'][ $idx ] ) ? absint( $_POST['product_id'][ $idx ] ) : 0;
+                $product_id = $product_id > 0 ? $product_id : null;
+
+                $product_sku = null;
+                if ( isset( $_POST['product_sku'][ $idx ] ) ) {
+                    $product_sku = sanitize_text_field( $_POST['product_sku'][ $idx ] );
+                    if ( '' === $product_sku ) {
+                        $product_sku = null;
+                    }
+                }
+
                 $wpdb->insert( $item_tb, array(
-                    'invoice_id'  => $id,
-                    'line_no'     => $line_no,
-                    'item_name'   => $name,
-                    'qty'         => $qty,
-                    'unit_price'  => $price,
-                    'line_total'  => $total,
+                    'invoice_id'   => $id,
+                    'line_no'      => $line_no,
+                    'item_name'    => $name,
+                    'product_id'   => $product_id,
+                    'product_sku'  => $product_sku,
+                    'qty'          => $qty,
+                    'unit_price'   => $price,
+                    'line_total'   => $total,
                 ) );
                 $line_no++;
             }
