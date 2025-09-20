@@ -2,3 +2,9 @@
 #bwk-items-table input { width: 100%; }
 #bwk-items-table .bwk-line-total { text-align: right; }
 .wrap .widefat td { vertical-align: top; }
+#bwk-items-table .bwk-product-toggle { margin-top: 4px; }
+#bwk-items-table .bwk-product-picker { display: none; margin-top: 6px; }
+#bwk-items-table .bwk-product-picker.is-active { display: block; }
+#bwk-items-table .bwk-product-search,
+#bwk-items-table .bwk-product-select { width: 100%; }
+#bwk-items-table .bwk-product-search { margin-bottom: 4px; }
