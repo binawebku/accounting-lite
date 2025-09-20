@@ -52,6 +52,14 @@ function bwk_next_invoice_number() {
     return $prefix . str_pad( (string) $seq, $pad, '0', STR_PAD_LEFT );
 }
 
+function bwk_preview_invoice_number() {
+    $seq = (int) bwk_get_option( 'invoice_seq', 0 );
+    $seq++;
+    $prefix = bwk_get_option( 'number_prefix', 'INV-' );
+    $pad    = (int) bwk_get_option( 'number_padding', 4 );
+    return $prefix . str_pad( (string) $seq, $pad, '0', STR_PAD_LEFT );
+}
+
 function bwk_next_quote_number() {
     $seq = (int) bwk_get_option( 'quote_seq', 0 );
     $seq++;

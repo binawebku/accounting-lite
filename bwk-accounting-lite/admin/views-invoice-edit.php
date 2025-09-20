@@ -3,6 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 $invoice_id = $invoice ? intval( $invoice->id ) : 0;
+$number_value = $invoice ? $invoice->number : $next_invoice_number;
 ?>
 <div class="wrap">
     <h1><?php echo $invoice_id ? esc_html__( 'Edit Invoice', 'bwk-accounting-lite' ) : esc_html__( 'Add Invoice', 'bwk-accounting-lite' ); ?></h1>
@@ -12,7 +13,7 @@ $invoice_id = $invoice ? intval( $invoice->id ) : 0;
         <input type="hidden" name="invoice_id" value="<?php echo esc_attr( $invoice_id ); ?>" />
         <table class="form-table">
             <tr><th><label for="number"><?php _e( 'Number', 'bwk-accounting-lite' ); ?></label></th>
-            <td><input name="number" id="number" type="text" value="<?php echo esc_attr( $invoice ? $invoice->number : '' ); ?>" class="regular-text" /></td></tr>
+            <td><input name="number" id="number" type="text" value="<?php echo esc_attr( $number_value ); ?>" class="regular-text" /></td></tr>
             <tr><th><label for="status"><?php _e( 'Status', 'bwk-accounting-lite' ); ?></label></th>
             <td><select name="status" id="status">
                 <?php foreach ( array( 'draft','sent','paid','partial','void' ) as $st ) : ?>
