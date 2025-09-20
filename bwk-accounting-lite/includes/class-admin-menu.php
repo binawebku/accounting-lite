@@ -16,8 +16,9 @@ class BWK_Admin_Menu {
 
     public static function register_menu() {
         $cap = 'manage_options';
-        add_menu_page( __( 'BWK Accounting', 'bwk-accounting-lite' ), __( 'BWK Accounting', 'bwk-accounting-lite' ), $cap, 'bwk-accounting', array( 'BWK_Invoices', 'render_list_page' ), 'dashicons-media-spreadsheet', 56 );
-        add_submenu_page( 'bwk-accounting', __( 'Invoices', 'bwk-accounting-lite' ), __( 'Invoices', 'bwk-accounting-lite' ), $cap, 'bwk-accounting', array( 'BWK_Invoices', 'render_list_page' ) );
+        add_menu_page( __( 'BWK Accounting', 'bwk-accounting-lite' ), __( 'BWK Accounting', 'bwk-accounting-lite' ), $cap, 'bwk-accounting', array( 'BWK_Dashboard', 'render_page' ), 'dashicons-media-spreadsheet', 56 );
+        add_submenu_page( 'bwk-accounting', __( 'Dashboard', 'bwk-accounting-lite' ), __( 'Dashboard', 'bwk-accounting-lite' ), $cap, 'bwk-accounting', array( 'BWK_Dashboard', 'render_page' ) );
+        add_submenu_page( 'bwk-accounting', __( 'Invoices', 'bwk-accounting-lite' ), __( 'Invoices', 'bwk-accounting-lite' ), $cap, 'bwk-invoices', array( 'BWK_Invoices', 'render_list_page' ) );
         add_submenu_page( 'bwk-accounting', __( 'Add New Invoice', 'bwk-accounting-lite' ), __( 'Add New', 'bwk-accounting-lite' ), $cap, 'bwk-invoice-add', array( 'BWK_Invoices', 'render_edit_page' ) );
         add_submenu_page( 'bwk-accounting', __( 'Quotes', 'bwk-accounting-lite' ), __( 'Quotes', 'bwk-accounting-lite' ), $cap, 'bwk-quotes', array( 'BWK_Quotes_Table', 'render_list_page' ) );
         add_submenu_page( 'bwk-accounting', __( 'Add New Quote', 'bwk-accounting-lite' ), __( 'Add Quote', 'bwk-accounting-lite' ), $cap, 'bwk-quote-add', array( 'BWK_Quotes_Table', 'render_edit_page' ) );

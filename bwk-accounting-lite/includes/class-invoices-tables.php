@@ -130,7 +130,7 @@ class BWK_Invoices {
             BWK_Ledger::insert_zakat( $id, $zakat_total, $data['currency'] );
         }
 
-        wp_redirect( admin_url( 'admin.php?page=bwk-accounting' ) );
+        wp_redirect( admin_url( 'admin.php?page=bwk-invoices' ) );
         exit;
     }
 

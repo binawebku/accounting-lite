@@ -11,7 +11,7 @@ $wp_admin_bar->add_node( array(
     'id'     => 'bwk-accounting-invoices',
     'parent' => 'bwk-accounting',
     'title'  => __( 'Invoices', 'bwk-accounting-lite' ),
-    'href'   => admin_url( 'admin.php?page=bwk-accounting' ),
+    'href'   => admin_url( 'admin.php?page=bwk-invoices' ),
 ) );
 $wp_admin_bar->add_node( array(
     'id'     => 'bwk-accounting-ledger',

@@ -18,6 +18,11 @@ class BWK_Rest {
             'callback'            => array( __CLASS__, 'get_invoice' ),
             'permission_callback' => '__return_true',
         ) );
+        register_rest_route( 'bwk-accounting/v1', '/dashboard', array(
+            'methods'             => 'GET',
+            'callback'            => array( __CLASS__, 'get_dashboard_metrics' ),
+            'permission_callback' => array( __CLASS__, 'can_view_dashboard' ),
+        ) );
     }
 
     public static function get_invoice( $request ) {
@@ -40,6 +45,33 @@ class BWK_Rest {
         }
         unset( $item );
         $invoice['items'] = $items;
+        $dashboard        = BWK_Dashboard::get_metrics();
+        $invoice['zakat_to_pay'] = isset( $dashboard['zakat_to_pay'] ) ? $dashboard['zakat_to_pay'] : 0.0;
         return rest_ensure_response( $invoice );
+    }
+
+    public static function get_dashboard_metrics( $request ) {
+        $args = array();
+
+        $start = $request->get_param( 'start_date' );
+        if ( $start ) {
+            $args['start_date'] = sanitize_text_field( $start );
+        }
+
+        $end = $request->get_param( 'end_date' );
+        if ( $end ) {
+            $args['end_date'] = sanitize_text_field( $end );
+        }
+
+        $currency = $request->get_param( 'currency' );
+        if ( $currency ) {
+            $args['currency'] = sanitize_text_field( $currency );
+        }
+
+        return rest_ensure_response( BWK_Dashboard::get_metrics( $args ) );
+    }
+
+    public static function can_view_dashboard() {
+        return bwk_current_user_can();
     }
 }
