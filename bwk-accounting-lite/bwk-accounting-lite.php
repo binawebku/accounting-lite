@@ -36,6 +36,7 @@ register_uninstall_hook( __FILE__, array( 'BWK_Uninstaller', 'uninstall' ) );
 function bwk_accounting_lite_init() {
     BWK_Activator::upgrade();
     BWK_Settings::init();
+    BWK_Dashboard::init();
     BWK_Admin_Menu::init();
     BWK_Invoices::init();
     BWK_Quotes_Table::init();

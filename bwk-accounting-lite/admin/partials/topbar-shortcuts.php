@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $wp_admin_bar->add_node( array(
     'id'    => 'bwk-accounting',
     'title' => 'BWK Accounting',
-    'href'  => admin_url( 'admin.php?page=bwk-accounting' ),
+    'href'  => admin_url( 'admin.php?page=bwk-dashboard' ),
 ) );
 $wp_admin_bar->add_node( array(
     'id'     => 'bwk-accounting-invoices',
