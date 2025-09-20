@@ -33,16 +33,48 @@ $invoice_id = $invoice ? intval( $invoice->id ) : 0;
                 <?php
                 if ( $items ) {
                     foreach ( $items as $it ) {
-                        $product_id  = $it->product_id ? absint( $it->product_id ) : '';
-                        $product_sku = $it->product_sku ? $it->product_sku : '';
-                        echo '<tr>';
-                        echo '<td><input type="text" name="item_name[]" value="' . esc_attr( $it->item_name ) . '" />';
-                        echo '<input type="hidden" class="bwk-product-id" name="product_id[]" value="' . esc_attr( $product_id ) . '" />';
-                        echo '<input type="hidden" class="bwk-product-sku" name="product_sku[]" value="' . esc_attr( $product_sku ) . '" /></td>';
-                        echo '<td><input type="number" step="0.01" name="qty[]" value="' . esc_attr( $it->qty ) . '" class="bwk-qty" /></td>';
-                        echo '<td><input type="number" step="0.01" name="unit_price[]" value="' . esc_attr( $it->unit_price ) . '" class="bwk-price" /></td>';
-                        echo '<td class="bwk-line-total">' . esc_html( $it->line_total ) . '</td><td><button type="button" class="button bwk-remove">&times;</button></td>';
-                        echo '</tr>';
+                        $product_id       = $it->product_id ? absint( $it->product_id ) : '';
+                        $product_sku      = $it->product_sku ? $it->product_sku : '';
+                        $picker_classes   = 'bwk-product-picker';
+                        $option_label     = $it->item_name;
+                        $product_selected = ! empty( $product_id );
+
+                        if ( $product_selected ) {
+                            $picker_classes .= ' is-active';
+                        }
+
+                        if ( $product_sku ) {
+                            $option_label .= ' (' . $product_sku . ')';
+                        }
+                        ?>
+                        <tr class="bwk-item-row">
+                            <td>
+                                <input type="text" name="item_name[]" value="<?php echo esc_attr( $it->item_name ); ?>" />
+                                <input type="hidden" class="bwk-product-id" name="product_id[]" value="<?php echo esc_attr( $product_id ); ?>" />
+                                <input type="hidden" class="bwk-product-sku" name="product_sku[]" value="<?php echo esc_attr( $product_sku ); ?>" />
+                                <div class="bwk-product-toggle">
+                                    <label>
+                                        <input type="checkbox" class="bwk-use-product" <?php checked( $product_selected ); ?> />
+                                        <?php esc_html_e( 'Use existing product', 'bwk-accounting-lite' ); ?>
+                                    </label>
+                                    <div class="<?php echo esc_attr( $picker_classes ); ?>">
+                                        <input type="search" class="bwk-product-search" placeholder="<?php esc_attr_e( 'Search for a product…', 'bwk-accounting-lite' ); ?>" />
+                                        <select class="bwk-product-select">
+                                            <option value=""><?php esc_html_e( 'Select a product', 'bwk-accounting-lite' ); ?></option>
+                                            <?php if ( $product_selected ) : ?>
+                                                <option value="<?php echo esc_attr( $product_id ); ?>" data-name="<?php echo esc_attr( $it->item_name ); ?>" data-price="<?php echo esc_attr( $it->unit_price ); ?>" data-sku="<?php echo esc_attr( $product_sku ); ?>" selected><?php echo esc_html( $option_label ); ?></option>
+                                            <?php endif; ?>
+                                        </select>
+                                        <p class="description"><?php esc_html_e( 'Start typing to search WooCommerce products.', 'bwk-accounting-lite' ); ?></p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><input type="number" step="0.01" name="qty[]" value="<?php echo esc_attr( $it->qty ); ?>" class="bwk-qty" /></td>
+                            <td><input type="number" step="0.01" name="unit_price[]" value="<?php echo esc_attr( $it->unit_price ); ?>" class="bwk-price" /></td>
+                            <td class="bwk-line-total"><?php echo esc_html( $it->line_total ); ?></td>
+                            <td><button type="button" class="button bwk-remove">&times;</button></td>
+                        </tr>
+                        <?php
                     }
                 }
                 ?>

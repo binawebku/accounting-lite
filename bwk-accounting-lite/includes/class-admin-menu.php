@@ -31,6 +31,25 @@ class BWK_Admin_Menu {
         }
         wp_enqueue_style( 'bwk-admin', BWK_AL_URL . 'admin/css/admin.css', array(), BWK_AL_VERSION );
         wp_enqueue_script( 'bwk-admin', BWK_AL_URL . 'admin/js/admin.js', array( 'jquery' ), BWK_AL_VERSION, true );
+        wp_localize_script(
+            'bwk-admin',
+            'bwkAdminData',
+            array(
+                'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
+                'searchNonce'      => wp_create_nonce( 'bwk_search_products' ),
+                'productsEnabled'  => class_exists( 'WooCommerce' ),
+                'i18n'             => array(
+                    'useProductLabel'   => __( 'Use existing product', 'bwk-accounting-lite' ),
+                    'searchPlaceholder' => __( 'Search for a product…', 'bwk-accounting-lite' ),
+                    'searchHelp'        => __( 'Start typing to search WooCommerce products.', 'bwk-accounting-lite' ),
+                    'selectPrompt'      => __( 'Select a product', 'bwk-accounting-lite' ),
+                    'searching'         => __( 'Searching…', 'bwk-accounting-lite' ),
+                    'noResults'         => __( 'No products found.', 'bwk-accounting-lite' ),
+                    'error'             => __( 'Unable to load products.', 'bwk-accounting-lite' ),
+                    'noWooCommerce'     => __( 'WooCommerce must be active to search products.', 'bwk-accounting-lite' ),
+                ),
+            )
+        );
     }
     public static function admin_bar($wp_admin_bar) {
         if ( ! bwk_current_user_can() ) {
