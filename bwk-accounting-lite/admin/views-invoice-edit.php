@@ -33,10 +33,16 @@ $invoice_id = $invoice ? intval( $invoice->id ) : 0;
                 <?php
                 if ( $items ) {
                     foreach ( $items as $it ) {
-                        echo '<tr><td><input type="text" name="item_name[]" value="' . esc_attr( $it->item_name ) . '" /></td>';
+                        $product_id  = $it->product_id ? absint( $it->product_id ) : '';
+                        $product_sku = $it->product_sku ? $it->product_sku : '';
+                        echo '<tr>';
+                        echo '<td><input type="text" name="item_name[]" value="' . esc_attr( $it->item_name ) . '" />';
+                        echo '<input type="hidden" class="bwk-product-id" name="product_id[]" value="' . esc_attr( $product_id ) . '" />';
+                        echo '<input type="hidden" class="bwk-product-sku" name="product_sku[]" value="' . esc_attr( $product_sku ) . '" /></td>';
                         echo '<td><input type="number" step="0.01" name="qty[]" value="' . esc_attr( $it->qty ) . '" class="bwk-qty" /></td>';
                         echo '<td><input type="number" step="0.01" name="unit_price[]" value="' . esc_attr( $it->unit_price ) . '" class="bwk-price" /></td>';
-                        echo '<td class="bwk-line-total">' . esc_html( $it->line_total ) . '</td><td><button type="button" class="button bwk-remove">&times;</button></td></tr>';
+                        echo '<td class="bwk-line-total">' . esc_html( $it->line_total ) . '</td><td><button type="button" class="button bwk-remove">&times;</button></td>';
+                        echo '</tr>';
                     }
                 }
                 ?>

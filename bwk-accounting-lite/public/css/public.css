@@ -4,5 +4,8 @@ body.bwk-invoice { font-family: sans-serif; margin: 20px; }
 .invoice-wrapper table, .invoice-wrapper th, .invoice-wrapper td { border: 1px solid #ccc; }
 .invoice-wrapper th, .invoice-wrapper td { padding: 6px; }
 .invoice-wrapper table.items th, .invoice-wrapper table.items td { text-align: left; }
+.invoice-wrapper table.items a { color: inherit; text-decoration: none; }
+.invoice-wrapper table.items a:hover { text-decoration: underline; }
+.invoice-wrapper .bwk-item-sku { font-size: 0.85em; margin-left: 8px; color: #666; letter-spacing: 0.03em; text-transform: uppercase; }
 .invoice-wrapper table.totals { margin-top: 20px; }
 @media print { body { margin: 0; } }

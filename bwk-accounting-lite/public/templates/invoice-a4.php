@@ -20,9 +20,42 @@ if ( ! defined( 'ABSPATH' ) ) {
     <table class="items">
         <thead><tr><th><?php _e( 'Item', 'bwk-accounting-lite' ); ?></th><th><?php _e( 'Qty', 'bwk-accounting-lite' ); ?></th><th><?php _e( 'Price', 'bwk-accounting-lite' ); ?></th><th><?php _e( 'Total', 'bwk-accounting-lite' ); ?></th></tr></thead>
         <tbody>
-            <?php foreach ( $items as $it ) : ?>
+            <?php foreach ( $items as $it ) :
+                $product_id = isset( $it->product_id ) ? absint( $it->product_id ) : 0;
+                $item_name  = isset( $it->item_name ) ? $it->item_name : '';
+                if ( '' === $item_name && $product_id ) {
+                    $product_post = get_post( $product_id );
+                    if ( $product_post && ! is_wp_error( $product_post ) ) {
+                        $item_name = $product_post->post_title;
+                    }
+                }
+                if ( '' === $item_name ) {
+                    $item_name = __( 'Item', 'bwk-accounting-lite' );
+                }
+
+                $item_markup = esc_html( $item_name );
+                if ( $product_id ) {
+                    $permalink = get_permalink( $product_id );
+                    if ( $permalink ) {
+                        $item_markup = sprintf(
+                            '<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
+                            esc_url( $permalink ),
+                            esc_html( $item_name )
+                        );
+                    }
+                }
+
+                $sku_markup = '';
+                if ( isset( $it->product_sku ) && '' !== $it->product_sku ) {
+                    $sku_markup = sprintf(
+                        ' <span class="bwk-item-sku">%1$s %2$s</span>',
+                        esc_html__( 'SKU:', 'bwk-accounting-lite' ),
+                        esc_html( $it->product_sku )
+                    );
+                }
+            ?>
             <tr>
-                <td><?php echo esc_html( $it->item_name ); ?></td>
+                <td><?php echo wp_kses_post( $item_markup . $sku_markup ); ?></td>
                 <td><?php echo esc_html( $it->qty ); ?></td>
                 <td><?php echo esc_html( $it->unit_price ); ?></td>
                 <td><?php echo esc_html( $it->line_total ); ?></td>
