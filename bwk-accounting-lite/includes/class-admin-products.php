@@ -25,14 +25,39 @@ class BWK_Admin_Products {
 
         check_ajax_referer( 'bwk_search_products', 'nonce' );
 
-        if ( ! class_exists( 'WooCommerce' ) || ! function_exists( 'wc_get_products' ) ) {
-            wp_send_json_error( array( 'message' => __( 'WooCommerce is not active.', 'bwk-accounting-lite' ) ) );
+        $term  = isset( $_REQUEST['term'] ) ? $_REQUEST['term'] : '';
+        $items = self::get_products_for_term( $term );
+
+        if ( is_wp_error( $items ) ) {
+            wp_send_json_error( array( 'message' => $items->get_error_message() ) );
         }
 
-        $term = isset( $_REQUEST['term'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['term'] ) ) : '';
+        wp_send_json_success( array( 'items' => $items ) );
+    }
+
+    /**
+     * Lookup WooCommerce products for the provided term.
+     *
+     * @param string $term Search term.
+     * @return array|WP_Error
+     */
+    public static function get_products_for_term( $term ) {
+        if ( ! class_exists( 'WooCommerce' ) || ! function_exists( 'wc_get_products' ) ) {
+            return new WP_Error(
+                'bwk_no_woocommerce',
+                __( 'WooCommerce is not active.', 'bwk-accounting-lite' ),
+                array(
+                    'status' => 400,
+                )
+            );
+        }
+
+        $term = is_string( $term ) ? $term : '';
+        $term = sanitize_text_field( wp_unslash( $term ) );
+        $term = trim( $term );
 
         if ( strlen( $term ) < 2 ) {
-            wp_send_json_success( array( 'items' => array() ) );
+            return array();
         }
 
         $query_args = array(
@@ -92,6 +117,6 @@ class BWK_Admin_Products {
             $seen_ids[ $product_id ] = true;
         }
 
-        wp_send_json_success( array( 'items' => $items ) );
+        return $items;
     }
 }

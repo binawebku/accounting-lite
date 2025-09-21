@@ -33,12 +33,16 @@ class BWK_Admin_Menu {
         }
         wp_enqueue_style( 'bwk-admin', BWK_AL_URL . 'admin/css/admin.css', array(), BWK_AL_VERSION );
         wp_enqueue_script( 'bwk-admin', BWK_AL_URL . 'admin/js/admin.js', array( 'jquery' ), BWK_AL_VERSION, true );
+        $rest_url   = function_exists( 'rest_url' ) ? rest_url( 'bwk-accounting/v1/products' ) : '';
+        $rest_nonce = $rest_url ? wp_create_nonce( 'wp_rest' ) : '';
         wp_localize_script(
             'bwk-admin',
             'bwkAdminData',
             array(
                 'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
                 'searchNonce'      => wp_create_nonce( 'bwk_search_products' ),
+                'restUrl'          => $rest_url,
+                'restNonce'        => $rest_nonce,
                 'productsEnabled'  => class_exists( 'WooCommerce' ),
                 'i18n'             => array(
                     'useProductLabel'   => __( 'Use existing product', 'bwk-accounting-lite' ),
