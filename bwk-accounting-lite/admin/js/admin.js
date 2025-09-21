@@ -24,7 +24,7 @@ jQuery(function($){
             + '<div class="bwk-product-toggle">'
             + '<label><input type="checkbox" class="bwk-use-product" /> ' + label + '</label>'
             + '<div class="bwk-product-picker">'
-            + '<input type="search" class="bwk-product-search" placeholder="' + placeholder + '" />'
+            + '<input type="search" class="bwk-product-search" placeholder="' + placeholder + '" autocomplete="off" />'
             + '<select class="bwk-product-select">'
             + ( prompt ? '<option value="">' + prompt + '</option>' : '' )
             + '</select>'
@@ -114,35 +114,91 @@ jQuery(function($){
     function resetProductFields($row) {
         $row.find('.bwk-product-id').val('');
         $row.find('.bwk-product-sku').val('');
+        $row.find('.bwk-product-search').val('');
+    }
+
+    function extractItems(response) {
+        if (!response) {
+            return [];
+        }
+        if (Array.isArray(response)) {
+            return response;
+        }
+        if (response.items && Array.isArray(response.items)) {
+            return response.items;
+        }
+        if (response.data) {
+            if (Array.isArray(response.data)) {
+                return response.data;
+            }
+            if (response.data.items && Array.isArray(response.data.items)) {
+                return response.data.items;
+            }
+        }
+        return [];
     }
 
     function fetchProducts(term, $select) {
-        if ( ! settings.ajaxUrl || ! settings.searchNonce ) {
+        var request;
+        var searchingText = settings.i18n.searching || 'Searching…';
+        var errorText = settings.i18n.error || 'Unable to load products.';
+        setSelectMessage($select, searchingText);
+
+        if ( settings.restUrl && settings.restNonce ) {
+            request = $.ajax({
+                url: settings.restUrl,
+                method: 'GET',
+                dataType: 'json',
+                data: { term: term },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-WP-Nonce', settings.restNonce);
+                }
+            });
+        } else if ( settings.ajaxUrl && settings.searchNonce ) {
+            request = $.ajax({
+                url: settings.ajaxUrl,
+                method: 'GET',
+                dataType: 'json',
+                data: {
+                    action: 'bwk_search_products',
+                    nonce: settings.searchNonce,
+                    term: term
+                }
+            });
+        }
+
+        if ( ! request ) {
+            setSelectMessage($select, errorText);
             return;
         }
-        setSelectMessage($select, settings.i18n.searching || 'Searching…');
-        $.ajax({
-            url: settings.ajaxUrl,
-            method: 'GET',
-            dataType: 'json',
-            data: {
-                action: 'bwk_search_products',
-                nonce: settings.searchNonce,
-                term: term
+
+        request.done(function(response){
+            if ( response && response.success === false ) {
+                var message = errorText;
+                if ( response.data && response.data.message ) {
+                    message = response.data.message;
+                }
+                setSelectMessage($select, message);
+                return;
             }
-        }).done(function(response){
-            if ( response && response.success && response.data && response.data.items ) {
-                populateSelect($select, response.data.items);
+            var items = extractItems(response);
+            if ( items.length ) {
+                populateSelect($select, items);
             } else {
-                setSelectMessage($select, settings.i18n.error || 'Unable to load products.');
+                populateSelect($select, []);
             }
-        }).fail(function(){
-            setSelectMessage($select, settings.i18n.error || 'Unable to load products.');
+        }).fail(function(jqXHR){
+            var message = errorText;
+            if ( jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.message ) {
+                message = jqXHR.responseJSON.message;
+            }
+            setSelectMessage($select, message);
         });
     }
 
     $('#bwk-add-row').on('click', function(){
         $('#bwk-items-table tbody').append(rowTemplate());
+        updateTotals();
     });
 
     $(document).on('click','.bwk-remove',function(){
@@ -198,6 +254,7 @@ jQuery(function($){
             return;
         }
         var $option = $select.find('option:selected');
+        var label = $option.text() || '';
         var name = $option.data('name') || '';
         var price = parseFloat($option.data('price'));
         var sku = $option.data('sku') || '';
@@ -213,6 +270,9 @@ jQuery(function($){
         }
         $row.find('.bwk-product-id').val(productId);
         $row.find('.bwk-product-sku').val(sku);
+        if ( label ) {
+            $row.find('.bwk-product-search').val(label);
+        }
         updateTotals();
     });
 

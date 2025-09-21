@@ -18,6 +18,23 @@ class BWK_Rest {
             'callback'            => array( __CLASS__, 'get_invoice' ),
             'permission_callback' => '__return_true',
         ) );
+        register_rest_route(
+            'bwk-accounting/v1',
+            '/products',
+            array(
+                array(
+                    'methods'             => WP_REST_Server::READABLE,
+                    'callback'            => array( __CLASS__, 'search_products' ),
+                    'permission_callback' => array( __CLASS__, 'can_manage_products' ),
+                    'args'                => array(
+                        'term' => array(
+                            'description'       => __( 'Search term for product lookup.', 'bwk-accounting-lite' ),
+                            'sanitize_callback' => 'sanitize_text_field',
+                        ),
+                    ),
+                ),
+            )
+        );
     }
 
     public static function get_invoice( $request ) {
@@ -41,5 +58,31 @@ class BWK_Rest {
         unset( $item );
         $invoice['items'] = $items;
         return rest_ensure_response( $invoice );
+    }
+
+    /**
+     * Check whether the current user can query products.
+     *
+     * @return bool
+     */
+    public static function can_manage_products( $request = null ) {
+        return bwk_current_user_can();
+    }
+
+    /**
+     * REST handler for WooCommerce product lookup.
+     *
+     * @param WP_REST_Request $request Request.
+     * @return WP_REST_Response|WP_Error
+     */
+    public static function search_products( WP_REST_Request $request ) {
+        $term  = $request->get_param( 'term' );
+        $items = BWK_Admin_Products::get_products_for_term( $term );
+
+        if ( is_wp_error( $items ) ) {
+            return $items;
+        }
+
+        return rest_ensure_response( array( 'items' => $items ) );
     }
 }

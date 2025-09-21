@@ -39,6 +39,7 @@ $number_value = $invoice ? $invoice->number : $next_invoice_number;
                         $picker_classes   = 'bwk-product-picker';
                         $option_label     = $it->item_name;
                         $product_selected = ! empty( $product_id );
+                        $search_value     = '';
 
                         if ( $product_selected ) {
                             $picker_classes .= ' is-active';
@@ -46,6 +47,10 @@ $number_value = $invoice ? $invoice->number : $next_invoice_number;
 
                         if ( $product_sku ) {
                             $option_label .= ' (' . $product_sku . ')';
+                        }
+
+                        if ( $product_selected ) {
+                            $search_value = $option_label;
                         }
                         ?>
                         <tr class="bwk-item-row">
@@ -59,7 +64,7 @@ $number_value = $invoice ? $invoice->number : $next_invoice_number;
                                         <?php esc_html_e( 'Use existing product', 'bwk-accounting-lite' ); ?>
                                     </label>
                                     <div class="<?php echo esc_attr( $picker_classes ); ?>">
-                                        <input type="search" class="bwk-product-search" placeholder="<?php esc_attr_e( 'Search for a product…', 'bwk-accounting-lite' ); ?>" />
+                                        <input type="search" class="bwk-product-search" value="<?php echo esc_attr( $search_value ); ?>" placeholder="<?php esc_attr_e( 'Search for a product…', 'bwk-accounting-lite' ); ?>" autocomplete="off" />
                                         <select class="bwk-product-select">
                                             <option value=""><?php esc_html_e( 'Select a product', 'bwk-accounting-lite' ); ?></option>
                                             <?php if ( $product_selected ) : ?>
