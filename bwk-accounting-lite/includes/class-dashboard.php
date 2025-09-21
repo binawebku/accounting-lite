@@ -31,6 +31,9 @@ class BWK_Dashboard {
         $recent_activity       = self::get_recent_activity();
         $invoice_summary       = self::summarize_invoice_totals( $invoice_status_totals );
         $primary_currency      = self::get_primary_currency();
+        $profit_window         = self::get_profit_window_args( $primary_currency );
+        $profit_summary        = BWK_Ledger::calculate_profit( $profit_window );
+        $profit_window_label   = isset( $profit_window['label'] ) ? $profit_window['label'] : '';
 
         include BWK_AL_PATH . 'admin/views-dashboard.php';
     }
@@ -86,7 +89,17 @@ class BWK_Dashboard {
             $months = 24;
         }
 
-        $series = self::get_revenue_series( $months );
+        $currency = '';
+
+        if ( isset( $_REQUEST['currency'] ) ) {
+            $currency = self::normalize_currency( wp_unslash( $_REQUEST['currency'] ) );
+        }
+
+        if ( ! $currency ) {
+            $currency = self::get_primary_currency();
+        }
+
+        $series = self::get_profit_series( $months, $currency );
         wp_send_json_success( $series );
     }
 
@@ -344,57 +357,85 @@ class BWK_Dashboard {
      *
      * @return array
      */
-    protected static function get_revenue_series( $months = 6 ) {
-        global $wpdb;
+    protected static function get_profit_series( $months = 6, $currency = '' ) {
+        $months   = max( 1, absint( $months ) );
+        $currency = self::normalize_currency( $currency );
 
-        $months = max( 1, absint( $months ) );
-        $end    = current_time( 'timestamp' );
-        $start  = strtotime( '-' . ( $months - 1 ) . ' months', $end );
-        $start  = $start ? $start : $end;
-        $start_date = wp_date( 'Y-m-01 00:00:00', $start );
-
-        $statuses      = array( 'paid' );
-        $placeholders  = implode( ',', array_fill( 0, count( $statuses ), '%s' ) );
-        $params        = array( $start_date );
-        $sql_condition = '';
-
-        if ( $statuses ) {
-            $sql_condition = ' AND status IN (' . $placeholders . ')';
-            $params        = array_merge( $params, $statuses );
+        if ( ! $currency ) {
+            $currency = self::get_primary_currency();
         }
 
-        $sql = 'SELECT DATE_FORMAT(created_at, "%%Y-%%m-01") AS period, SUM(grand_total) AS total FROM ' . bwk_table_invoices() . ' WHERE created_at >= %s' . $sql_condition . ' GROUP BY period ORDER BY period ASC';
-
-        $prepared = $wpdb->prepare( $sql, $params );
-        $rows     = $wpdb->get_results( $prepared, ARRAY_A );
-        $map      = array();
-
-        if ( $rows ) {
-            foreach ( $rows as $row ) {
-                if ( empty( $row['period'] ) ) {
-                    continue;
-                }
-                $key         = $row['period'];
-                $map[ $key ] = isset( $row['total'] ) ? (float) $row['total'] : 0.0;
-            }
-        }
-
-        $labels = array();
-        $values = array();
-
-        for ( $i = $months - 1; $i >= 0; $i-- ) {
-            $month_ts  = strtotime( '-' . $i . ' months', $end );
-            $month_ts  = $month_ts ? $month_ts : $end;
-            $period    = wp_date( 'Y-m-01', $month_ts );
-            $labels[]  = wp_date( 'M Y', $month_ts );
-            $values[]  = isset( $map[ $period ] ) ? round( (float) $map[ $period ], 2 ) : 0.0;
-        }
-
-        return array(
-            'labels'   => $labels,
-            'values'   => $values,
-            'currency' => self::get_primary_currency(),
+        $args = array(
+            'months'   => $months,
+            'currency' => $currency,
         );
+
+        /**
+         * Filter the arguments used when generating the profit series for the dashboard.
+         *
+         * @since 1.0.0
+         *
+         * @param array $args     Series arguments.
+         * @param int   $months   Number of months requested.
+         * @param string $currency Currency code.
+         */
+        $args = apply_filters( 'bwk_dashboard_profit_series_args', $args, $months, $currency );
+
+        if ( isset( $args['currency'] ) ) {
+            $args['currency'] = self::normalize_currency( $args['currency'] );
+        }
+
+        $series = BWK_Ledger::get_profit_series( $args );
+
+        if ( empty( $series['currency'] ) && ! empty( $args['currency'] ) ) {
+            $series['currency'] = $args['currency'];
+        }
+
+        return $series;
+    }
+
+    /**
+     * Determine the profit window used for the dashboard summary card.
+     *
+     * @param string $currency Currency code.
+     *
+     * @return array
+     */
+    protected static function get_profit_window_args( $currency ) {
+        $currency = self::normalize_currency( $currency );
+        $days     = (int) apply_filters( 'bwk_dashboard_profit_window_days', 30 );
+
+        if ( $days < 1 ) {
+            $days = 30;
+        }
+
+        $end_ts   = current_time( 'timestamp' );
+        $start_ts = strtotime( '-' . ( $days - 1 ) . ' days', $end_ts );
+        $start_ts = $start_ts ? $start_ts : $end_ts;
+
+        $range = array(
+            'start'    => wp_date( 'Y-m-d 00:00:00', $start_ts ),
+            'end'      => wp_date( 'Y-m-d 23:59:59', $end_ts ),
+            'currency' => $currency,
+        );
+
+        $range['label'] = sprintf(
+            /* translators: %s: number of days in the profit window. */
+            _n( 'Last %s day', 'Last %s days', $days, 'bwk-accounting-lite' ),
+            number_format_i18n( $days )
+        );
+
+        /**
+         * Filter the arguments passed to the profit calculation for the dashboard card.
+         *
+         * @since 1.0.0
+         *
+         * @param array  $range    Profit range arguments.
+         * @param string $currency Currency code.
+         */
+        $range = apply_filters( 'bwk_dashboard_profit_range', $range, $currency );
+
+        return $range;
     }
 
     /**

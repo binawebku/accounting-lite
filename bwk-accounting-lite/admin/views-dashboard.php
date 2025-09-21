@@ -10,6 +10,15 @@ $invoice_total    = isset( $invoice_summary['amount'] ) ? (float) $invoice_summa
 $invoice_count    = isset( $invoice_summary['count'] ) ? (int) $invoice_summary['count'] : 0;
 $invoice_paid     = isset( $invoice_summary['paid'] ) ? (float) $invoice_summary['paid'] : 0.0;
 $invoice_due      = isset( $invoice_summary['outstanding'] ) ? (float) $invoice_summary['outstanding'] : 0.0;
+$profit_summary   = isset( $profit_summary ) && is_array( $profit_summary ) ? $profit_summary : array();
+$profit_currency  = isset( $profit_summary['currency'] ) && $profit_summary['currency'] ? $profit_summary['currency'] : $primary_currency;
+$profit_prefix    = $profit_currency ? $profit_currency . ' ' : '';
+$profit_net       = isset( $profit_summary['net'] ) ? (float) $profit_summary['net'] : 0.0;
+$profit_sales     = isset( $profit_summary['sales'] ) ? (float) $profit_summary['sales'] : 0.0;
+$profit_refunds   = isset( $profit_summary['refunds'] ) ? (float) $profit_summary['refunds'] : 0.0;
+$profit_expenses  = isset( $profit_summary['expenses'] ) ? (float) $profit_summary['expenses'] : 0.0;
+$profit_costs     = isset( $profit_summary['costs'] ) ? (float) $profit_summary['costs'] : 0.0;
+$profit_window_label = isset( $profit_window_label ) ? (string) $profit_window_label : '';
 $invoice_status_totals = isset( $invoice_status_totals ) && is_array( $invoice_status_totals ) ? $invoice_status_totals : array();
 $quote_status_totals   = isset( $quote_status_totals ) && is_array( $quote_status_totals ) ? $quote_status_totals : array();
 $recent_activity       = isset( $recent_activity ) && is_array( $recent_activity ) ? $recent_activity : array();
@@ -18,6 +27,24 @@ $recent_activity       = isset( $recent_activity ) && is_array( $recent_activity
     <h1><?php esc_html_e( 'Accounting Dashboard', 'bwk-accounting-lite' ); ?></h1>
 
     <div class="bwk-dashboard-kpis">
+        <div class="bwk-dashboard-kpi">
+            <span class="bwk-dashboard-kpi-label"><?php esc_html_e( 'Net Profit', 'bwk-accounting-lite' ); ?></span>
+            <span class="bwk-dashboard-kpi-value"><?php echo esc_html( $profit_prefix . number_format_i18n( $profit_net, 2 ) ); ?></span>
+            <?php if ( $profit_window_label ) : ?>
+                <span class="bwk-dashboard-kpi-meta"><?php echo esc_html( $profit_window_label ); ?></span>
+            <?php endif; ?>
+            <?php
+            $profit_breakdown = sprintf(
+                /* translators: 1: sales total, 2: refunds total, 3: expenses total, 4: cost of goods total. */
+                __( 'Sales %1$s, refunds %2$s, expenses %3$s, costs %4$s', 'bwk-accounting-lite' ),
+                $profit_prefix . number_format_i18n( $profit_sales, 2 ),
+                $profit_prefix . number_format_i18n( $profit_refunds, 2 ),
+                $profit_prefix . number_format_i18n( $profit_expenses, 2 ),
+                $profit_prefix . number_format_i18n( $profit_costs, 2 )
+            );
+            ?>
+            <span class="bwk-dashboard-kpi-meta"><?php echo esc_html( $profit_breakdown ); ?></span>
+        </div>
         <div class="bwk-dashboard-kpi">
             <span class="bwk-dashboard-kpi-label"><?php esc_html_e( 'Total Invoiced', 'bwk-accounting-lite' ); ?></span>
             <span class="bwk-dashboard-kpi-value"><?php echo esc_html( $currency_prefix . number_format_i18n( $invoice_total, 2 ) ); ?></span>
@@ -94,7 +121,7 @@ $recent_activity       = isset( $recent_activity ) && is_array( $recent_activity
     <div class="bwk-dashboard-grid">
         <section class="bwk-dashboard-panel bwk-dashboard-panel-chart">
             <header class="bwk-dashboard-panel-header">
-                <h2><?php esc_html_e( 'Revenue Trend', 'bwk-accounting-lite' ); ?></h2>
+                <h2><?php esc_html_e( 'Net Profit Trend', 'bwk-accounting-lite' ); ?></h2>
             </header>
             <div class="bwk-dashboard-chart">
                 <canvas id="bwk-dashboard-chart"></canvas>
