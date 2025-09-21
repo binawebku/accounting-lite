@@ -16,7 +16,8 @@ class BWK_Admin_Menu {
 
     public static function register_menu() {
         $cap = 'manage_options';
-        add_menu_page( __( 'BWK Dashboard', 'bwk-accounting-lite' ), __( 'BWK Accounting', 'bwk-accounting-lite' ), $cap, 'bwk-dashboard', array( 'BWK_Dashboard', 'render_page' ), 'dashicons-chart-area', 56 );
+        $dashboard_hook = add_menu_page( __( 'BWK Dashboard', 'bwk-accounting-lite' ), __( 'BWK Accounting', 'bwk-accounting-lite' ), $cap, 'bwk-dashboard', array( 'BWK_Dashboard', 'render_page' ), 'dashicons-chart-area', 56 );
+        BWK_Dashboard::set_screen_hook( $dashboard_hook );
         add_submenu_page( 'bwk-dashboard', __( 'Dashboard', 'bwk-accounting-lite' ), __( 'Dashboard', 'bwk-accounting-lite' ), $cap, 'bwk-dashboard', array( 'BWK_Dashboard', 'render_page' ) );
         add_submenu_page( 'bwk-dashboard', __( 'Invoices', 'bwk-accounting-lite' ), __( 'Invoices', 'bwk-accounting-lite' ), $cap, 'bwk-accounting', array( 'BWK_Invoices', 'render_list_page' ) );
         add_submenu_page( 'bwk-dashboard', __( 'Add New Invoice', 'bwk-accounting-lite' ), __( 'Add New', 'bwk-accounting-lite' ), $cap, 'bwk-invoice-add', array( 'BWK_Invoices', 'render_edit_page' ) );
