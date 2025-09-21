@@ -36,7 +36,7 @@ class BWK_Invoices {
             $invoice = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . bwk_table_invoices() . ' WHERE id=%d', $id ) );
             $items   = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . bwk_table_invoice_items() . ' WHERE invoice_id=%d ORDER BY line_no ASC', $id ) );
         }
-        $next_invoice_number = null;
+        $next_invoice_number = '';
         if ( ! $invoice ) {
             $next_invoice_number = bwk_preview_invoice_number();
         }
