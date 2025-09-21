@@ -1,0 +1,28 @@
+{
+    "name": "wan-mohd-aiman/accounting-lite",
+    "description": "Development tooling for BWK Accounting Lite tests.",
+    "type": "project",
+    "license": "GPL-2.0-or-later",
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^9.6"
+    },
+    "autoload": {
+        "files": []
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "": "includes/",
+            "BWK\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Wan Mohd Aiman Binawebpro.com"
+        }
+    ],
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "minimum-stability": "stable"
+}
