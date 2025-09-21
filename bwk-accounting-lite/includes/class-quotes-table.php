@@ -13,7 +13,7 @@ class BWK_Quotes_Table {
     public static function init() {
         add_action( 'admin_post_bwk_save_quote', array( __CLASS__, 'save_quote' ) );
         add_action( 'admin_post_bwk_convert_quote', array( __CLASS__, 'convert_to_invoice' ) );
-        add_action( 'admin_init', array( __CLASS__, 'maybe_render_print_quote' ) );
+        add_action( 'template_redirect', array( __CLASS__, 'maybe_render_print_quote' ) );
         add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
     }
 
@@ -209,6 +209,10 @@ class BWK_Quotes_Table {
     }
 
     public static function maybe_render_print_quote() {
+        if ( is_admin() ) {
+            return;
+        }
+
         if ( isset( $_GET['bwk_quote'] ) ) {
             $id    = intval( $_GET['bwk_quote'] );
             $nonce = isset( $_GET['_nonce'] ) ? sanitize_text_field( $_GET['_nonce'] ) : '';
