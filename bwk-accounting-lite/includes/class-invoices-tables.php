@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class BWK_Invoices {
     public static function init() {
         add_action( 'admin_post_bwk_save_invoice', array( __CLASS__, 'save_invoice' ) );
-        add_action( 'admin_init', array( __CLASS__, 'maybe_render_print_invoice' ) );
+        add_action( 'template_redirect', array( __CLASS__, 'maybe_render_print_invoice' ) );
         add_shortcode( 'bwk_invoice', array( __CLASS__, 'shortcode_invoice' ) );
     }
 
@@ -135,6 +135,10 @@ class BWK_Invoices {
     }
 
     public static function maybe_render_print_invoice() {
+        if ( is_admin() ) {
+            return;
+        }
+
         if ( isset( $_GET['bwk_invoice'] ) ) {
             $id    = intval( $_GET['bwk_invoice'] );
             $nonce = isset( $_GET['_nonce'] ) ? sanitize_text_field( $_GET['_nonce'] ) : '';
